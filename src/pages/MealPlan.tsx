@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock, Info } from 'lucide-react';
+import { Clock, ChevronDown } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 interface Meal {
@@ -10,179 +10,126 @@ interface Meal {
   approxKcal: number;
   approxProtein: number;
   tip?: string;
+  accent: string;
 }
 
-function generateMealPlan(targetCalories: number, _targetProtein: number, weight: number): Meal[] {
-  // Based on targets, generate a realistic meal plan
-  const isHighCal = targetCalories > 3000;
-
+function generateMealPlan(targetCalories: number, weight: number): Meal[] {
+  const big = targetCalories > 3000;
   return [
     {
-      time: '7:00 - 8:00',
-      name: 'Desayuno',
-      emoji: '🌅',
-      foods: [
-        `${isHighCal ? '100g' : '80g'} avena con leche`,
-        '3 huevos revueltos (o 1 entero + 2 claras)',
-        '1 banana mediana',
-        'Café o té sin azúcar',
-      ],
-      approxKcal: isHighCal ? 620 : 500,
-      approxProtein: 35,
-      tip: 'La avena te da energía sostenida y los huevos proteína completa para empezar el día.',
+      time: '7:00 - 8:00', name: 'Desayuno', emoji: '🌅', accent: '#f59e0b',
+      foods: [`${big ? '100g' : '80g'} de avena con leche`, '3 huevos (o 1 entero + 2 claras)', '1 plátano', 'Café o té sin azúcar'],
+      approxKcal: big ? 620 : 500, approxProtein: 35,
+      tip: 'La avena da energía duradera y los huevos proteína para arrancar el día.',
     },
     {
-      time: '10:00 - 10:30',
-      name: 'Pre-entreno / Snack mañana',
-      emoji: '⚡',
-      foods: [
-        '1 scoop de whey protein (si tienes)',
-        `${isHighCal ? '2' : '1'} rebanada(s) de pan integral con mantequilla de maní`,
-        '1 manzana o fruta a elección',
-      ],
-      approxKcal: isHighCal ? 400 : 300,
-      approxProtein: 28,
-      tip: '30-60 min antes del entreno: carbos de fácil digestión + proteína. Evita comidas pesadas justo antes.',
+      time: '10:30', name: 'Snack mañana', emoji: '⚡', accent: '#22d3ee',
+      foods: ['1 yogur griego', `${big ? '2' : '1'} puñado(s) de almendras`, '1 fruta'],
+      approxKcal: big ? 380 : 300, approxProtein: 20,
+      tip: 'Mantén la proteína cada pocas horas para alimentar el músculo todo el día.',
     },
     {
-      time: 'Justo tras entrenar',
-      name: 'Post-entreno',
-      emoji: '💪',
-      foods: [
-        '1 scoop de whey con agua o leche (prioritario)',
-        '1 banana grande (repone glucógeno rápido)',
-        '(Opcional) 50g de arroz blanco',
-      ],
-      approxKcal: 300,
-      approxProtein: 25,
-      tip: 'La ventana post-entreno (30 min) es clave: proteína rápida + carbos simples para recuperación muscular.',
+      time: 'Tras entrenar', name: 'Post-entreno', emoji: '💪', accent: '#4ade80',
+      foods: ['1 batido de whey con leche o agua', '1 plátano grande', '(opcional) puñado de arroz'],
+      approxKcal: 320, approxProtein: 28,
+      tip: 'En los 30-60 min tras entrenar: proteína rápida + carbos para recuperar.',
     },
     {
-      time: '12:30 - 13:30',
-      name: 'Almuerzo',
-      emoji: '☀️',
-      foods: [
-        `${Math.round(weight * 2)}g de pechuga de pollo o atún`,
-        `${isHighCal ? '200g' : '150g'} de arroz integral o pasta integral (cocido)`,
-        'Ensalada abundante (espinaca, tomate, pepino)',
-        '½ aguacate',
-        '1 cdta de aceite de oliva',
-      ],
-      approxKcal: isHighCal ? 750 : 600,
-      approxProtein: 55,
-      tip: 'Esta es tu comida más importante del día. Proteína magra + carbos complejos + grasas buenas.',
+      time: '13:00 - 14:00', name: 'Almuerzo', emoji: '☀️', accent: '#60a5fa',
+      foods: [`${Math.round(weight * 2)}g de pollo o atún`, `${big ? 'plato lleno' : '1 taza'} de arroz o pasta`, 'Ensalada abundante', '½ aguacate'],
+      approxKcal: big ? 750 : 600, approxProtein: 55,
+      tip: 'Tu comida más importante: proteína + carbos + grasas buenas + verduras.',
     },
     {
-      time: '17:00 - 18:00',
-      name: 'Merienda',
-      emoji: '🥜',
-      foods: [
-        '200g yogur griego 0%',
-        '30g almendras o nueces',
-        '1 fruta (kiwi, naranja, fresa)',
-      ],
-      approxKcal: 280,
-      approxProtein: 22,
-      tip: 'Snack alto en proteína para no llegar con hambre a cenar y mantener síntesis muscular constante.',
+      time: '17:30', name: 'Merienda', emoji: '🥜', accent: '#fb7185',
+      foods: ['200g yogur griego', '1 puñado de frutos secos', '1 fruta'],
+      approxKcal: 280, approxProtein: 22,
+      tip: 'Para no llegar con hambre a la cena y seguir sumando proteína.',
     },
     {
-      time: '19:30 - 20:30',
-      name: 'Cena',
-      emoji: '🌙',
-      foods: [
-        `${Math.round(weight * 1.8)}g de salmón, tilapia o carne magra`,
-        `${isHighCal ? '150g' : '100g'} batata / camote al horno`,
-        'Brócoli o verduras al vapor (abundante)',
-        '1 cdta de aceite de oliva',
-      ],
-      approxKcal: isHighCal ? 600 : 480,
-      approxProtein: 45,
-      tip: 'Mantén los carbos moderados en la cena. La proteína es esencial para la recuperación nocturna.',
+      time: '20:30 - 21:00', name: 'Cena', emoji: '🌙', accent: '#a78bfa',
+      foods: [`${Math.round(weight * 1.8)}g de salmón, pescado o carne magra`, `${big ? '150g' : '100g'} de batata`, 'Verduras al vapor', '1 cdta de aceite de oliva'],
+      approxKcal: big ? 600 : 480, approxProtein: 45,
+      tip: 'Proteína para recuperar durante la noche. Carbos moderados.',
     },
   ];
 }
 
-export default function MealPlan() {
-  const { state, targets } = useApp();
-  const [expanded, setExpanded] = useState<number | null>(0);
+interface MealPlanProps {
+  onNavigate?: (tab: string) => void;
+}
 
+export default function MealPlan({ onNavigate }: MealPlanProps) {
+  const { state, targets } = useApp();
+  const [open, setOpen] = useState<number | null>(0);
   if (!state.profile || !targets) return null;
 
-  const meals = generateMealPlan(targets.calories, targets.protein, state.profile.weight);
-  const totalPlanKcal = meals.reduce((a, m) => a + m.approxKcal, 0);
-  const totalPlanProtein = meals.reduce((a, m) => a + m.approxProtein, 0);
+  const meals = generateMealPlan(targets.calories, state.profile.weight);
 
   return (
-    <div className="pb-24 px-4 pt-6 max-w-md mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-1">Plan de comidas</h1>
-        <p className="text-slate-400 text-sm">Personalizado para tu objetivo de músculo</p>
-      </div>
+    <div className="pb-32 px-4 pt-6 max-w-md mx-auto stagger">
+      <h1 className="text-2xl font-bold text-white mb-1">Tu plan de comidas 🍽️</h1>
+      <p className="text-slate-400 text-sm mb-5">Una guía lista para seguir, ajustada a ti.</p>
 
-      {/* Summary card */}
-      <div className="glass rounded-2xl p-4 mb-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Info size={16} className="text-brand-400" />
-          <span className="text-white font-semibold text-sm">Tu meta diaria</span>
-        </div>
-        <div className="grid grid-cols-4 gap-3 text-center">
+      {/* Daily goal summary */}
+      <div className="glass rounded-3xl p-5 mb-5 card-shadow">
+        <p className="text-slate-400 text-xs mb-3 font-medium">META DIARIA</p>
+        <div className="grid grid-cols-4 gap-2 text-center">
           {[
-            { label: 'Calorías', value: targets.calories, unit: 'kcal', color: 'text-brand-400' },
-            { label: 'Proteína', value: `${targets.protein}g`, unit: '', color: 'text-green-400' },
-            { label: 'Carbos', value: `${targets.carbs}g`, unit: '', color: 'text-blue-400' },
-            { label: 'Grasa', value: `${targets.fat}g`, unit: '', color: 'text-yellow-400' },
+            { value: targets.calories, label: 'kcal', c: 'text-brand-400' },
+            { value: `${targets.protein}g`, label: 'proteína', c: 'text-green-400' },
+            { value: `${targets.carbs}g`, label: 'carbos', c: 'text-blue-400' },
+            { value: `${targets.fat}g`, label: 'grasa', c: 'text-yellow-400' },
           ].map(m => (
             <div key={m.label}>
-              <div className={`font-bold text-lg ${m.color}`}>{m.value}</div>
-              <div className="text-slate-500 text-xs">{m.label}</div>
+              <div className={`font-bold text-lg ${m.c}`}>{m.value}</div>
+              <div className="text-slate-500 text-[10px]">{m.label}</div>
             </div>
           ))}
         </div>
-        <div className="mt-3 pt-3 border-t border-slate-700/50 flex justify-between text-xs text-slate-500">
-          <span>Plan total: ~{totalPlanKcal} kcal</span>
-          <span>~{totalPlanProtein}g proteína</span>
-        </div>
       </div>
 
-      {/* Meals */}
       <div className="space-y-3">
         {meals.map((meal, i) => (
-          <div key={i} className="glass rounded-2xl overflow-hidden">
-            <button
-              onClick={() => setExpanded(expanded === i ? null : i)}
-              className="w-full flex items-center gap-4 p-4 text-left"
-            >
-              <span className="text-2xl">{meal.emoji}</span>
-              <div className="flex-1">
+          <div key={i} className="glass rounded-3xl overflow-hidden card-shadow">
+            <button onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center gap-3.5 p-4 text-left">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ backgroundColor: `${meal.accent}22` }}>
+                {meal.emoji}
+              </div>
+              <div className="flex-1 min-w-0">
                 <div className="font-semibold text-white">{meal.name}</div>
-                <div className="flex items-center gap-3 mt-0.5">
-                  <span className="flex items-center gap-1 text-xs text-slate-400">
-                    <Clock size={11} /> {meal.time}
+                <div className="flex items-center gap-2 mt-0.5">
+                  <Clock size={11} className="text-slate-500" />
+                  <span className="text-xs text-slate-500">{meal.time}</span>
+                  <span className="text-xs px-1.5 py-0.5 rounded-md" style={{ backgroundColor: `${meal.accent}22`, color: meal.accent }}>
+                    {meal.approxProtein}g prot
                   </span>
-                  <span className="text-xs text-slate-500">~{meal.approxKcal} kcal • {meal.approxProtein}g prot</span>
                 </div>
               </div>
-              <div className={`text-slate-400 transition-transform duration-200 ${expanded === i ? 'rotate-180' : ''}`}>
-                ▼
-              </div>
+              <ChevronDown size={18} className={`text-slate-500 transition-transform ${open === i ? 'rotate-180' : ''}`} />
             </button>
 
-            {expanded === i && (
-              <div className="px-4 pb-4 space-y-3 animate-fade-in">
-                <div className="h-px bg-slate-700/50" />
-                <div className="space-y-2">
+            {open === i && (
+              <div className="px-4 pb-4 animate-fade-in">
+                <div className="h-px bg-slate-700/40 mb-3" />
+                <div className="space-y-2 mb-3">
                   {meal.foods.map((food, j) => (
-                    <div key={j} className="flex items-start gap-2 text-sm">
-                      <span className="text-brand-400 font-bold mt-0.5">•</span>
+                    <div key={j} className="flex items-start gap-2.5 text-sm">
+                      <div className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: meal.accent }} />
                       <span className="text-slate-300">{food}</span>
                     </div>
                   ))}
                 </div>
                 {meal.tip && (
-                  <div className="bg-brand-500/10 border border-brand-500/20 rounded-xl p-3 flex items-start gap-2">
-                    <span className="text-brand-400 text-sm">💡</span>
+                  <div className="rounded-2xl p-3 flex items-start gap-2" style={{ backgroundColor: `${meal.accent}15` }}>
+                    <span className="text-sm">💡</span>
                     <p className="text-slate-300 text-xs leading-relaxed">{meal.tip}</p>
                   </div>
+                )}
+                {onNavigate && (
+                  <button onClick={() => onNavigate('log')} className="press w-full mt-3 py-2.5 rounded-xl bg-slate-800/60 text-slate-300 text-sm font-medium hover:bg-slate-700/60">
+                    Registrar esta comida →
+                  </button>
                 )}
               </div>
             )}
@@ -190,12 +137,10 @@ export default function MealPlan() {
         ))}
       </div>
 
-      {/* Note */}
-      <div className="mt-5 bg-slate-800/50 rounded-xl p-4">
+      <div className="mt-5 bg-slate-800/40 rounded-2xl p-4">
         <p className="text-slate-400 text-sm leading-relaxed">
-          <span className="text-white font-medium">Nota:</span> Este plan es una guía base.
-          Puedes intercambiar alimentos equivalentes (pollo por pavo, arroz por pasta, etc.).
-          Lo importante es llegar a tus macros diarios.
+          <span className="text-white font-medium">💡 Recuerda:</span> es una guía flexible. Puedes cambiar pollo por pavo,
+          arroz por pasta, etc. Lo que importa es llegar a tu proteína y calorías del día.
         </p>
       </div>
     </div>

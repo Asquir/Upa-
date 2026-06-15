@@ -87,15 +87,20 @@ export default function Onboarding() {
               Tu guía de<br />
               <span className="text-brand-400">nutrición gym</span>
             </h1>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              Voy a ayudarte a calcular exactamente cuánto comer para construir músculo,
-              planificar tus comidas y hacer seguimiento de tu progreso.
+            <p className="text-slate-400 text-lg leading-relaxed mb-4">
+              Voy a calcular exactamente cuánto debes comer para construir músculo,
+              y te guiaré cada día.
             </p>
+            <div className="bg-brand-500/10 border border-brand-500/20 rounded-2xl p-3 mb-6">
+              <p className="text-brand-300 text-sm leading-relaxed">
+                ✨ <span className="font-semibold">No necesitas saber de calorías ni pesar comida.</span> Solo dime qué comiste y yo hago los números por ti.
+              </p>
+            </div>
             <div className="space-y-3">
               {[
-                { icon: <Target size={18} />, text: 'Calorías y macros personalizados' },
+                { icon: <Target size={18} />, text: 'Tus calorías y proteína calculadas' },
                 { icon: <Zap size={18} />, text: 'Plan de comidas listo para usar' },
-                { icon: <Activity size={18} />, text: 'Registro diario y seguimiento' },
+                { icon: <Activity size={18} />, text: 'Registro fácil por raciones' },
               ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-3 text-slate-300">
                   <div className="text-brand-400">{icon}</div>

@@ -48,6 +48,7 @@ export interface DayLog {
   totalProtein: number;
   totalCarbs: number;
   totalFat: number;
+  water: number; // ml
   weight?: number;
 }
 
@@ -56,10 +57,25 @@ export interface WeightEntry {
   weight: number;
 }
 
+export interface CustomFood {
+  id: string;
+  name: string;
+  emoji: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  serving: string;
+}
+
 export interface AppState {
   profile: UserProfile | null;
   targets: Macros | null;
   logs: Record<string, DayLog>;
   weightHistory: WeightEntry[];
   onboardingComplete: boolean;
+  favorites: string[];          // food ids
+  recentFoodIds: string[];      // most recently used food ids
+  customFoods: CustomFood[];
+  waterGoal: number;            // ml per day
 }

@@ -1,16 +1,16 @@
-import { Flame, Droplets, Zap, Trophy, ChevronRight, TrendingUp } from 'lucide-react';
+import { Flame, Plus, TrendingUp, Info, ChevronRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import ProgressRing from '../components/ProgressRing';
 import MacroBar from '../components/MacroBar';
+import WaterTracker from '../components/WaterTracker';
 import { getGreeting } from '../utils/calculations';
 
 const MEAL_TIMES = [
-  { type: 'breakfast', label: 'Desayuno', time: '7:00 - 8:00', emoji: '🌅' },
-  { type: 'pre_workout', label: 'Pre-entreno', time: '1h antes', emoji: '⚡' },
-  { type: 'post_workout', label: 'Post-entreno', time: 'Tras entrenar', emoji: '💪' },
-  { type: 'lunch', label: 'Almuerzo', time: '12:00 - 13:00', emoji: '☀️' },
-  { type: 'dinner', label: 'Cena', time: '19:00 - 20:00', emoji: '🌙' },
-  { type: 'snack', label: 'Snack', time: 'Entre comidas', emoji: '🥜' },
+  { type: 'breakfast', label: 'Desayuno', emoji: '🌅' },
+  { type: 'lunch', label: 'Almuerzo', emoji: '☀️' },
+  { type: 'post_workout', label: 'Post-entreno', emoji: '💪' },
+  { type: 'snack', label: 'Snack', emoji: '🥜' },
+  { type: 'dinner', label: 'Cena', emoji: '🌙' },
 ] as const;
 
 interface DashboardProps {
@@ -20,75 +20,64 @@ interface DashboardProps {
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const { state, todayLog, targets } = useApp();
   const { profile } = state;
-
   if (!profile || !targets) return null;
 
   const calories = todayLog?.totalCalories ?? 0;
   const protein = todayLog?.totalProtein ?? 0;
   const carbs = todayLog?.totalCarbs ?? 0;
   const fat = todayLog?.totalFat ?? 0;
-
   const calPct = Math.round((calories / targets.calories) * 100);
   const remaining = Math.max(targets.calories - calories, 0);
-
-  // Meals with entries today
   const mealTypesLogged = new Set(todayLog?.entries.map(e => e.mealType) ?? []);
 
-  // Streak: count consecutive days with logs
+  // streak
   const today = new Date();
   let streak = 0;
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 60; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
     const key = d.toISOString().split('T')[0];
     const log = state.logs[key];
     if (log && log.totalCalories > 0) streak++;
+    else if (i === 0) continue;
     else break;
   }
 
+  const statusMsg =
+    calPct >= 100 ? '¡Meta alcanzada! 🎉 Gran trabajo hoy.' :
+    calPct >= 70 ? `Casi lo logras — faltan ${remaining} kcal.` :
+    calPct >= 30 ? `Vas bien, sigue sumando comidas.` :
+    `Empieza el día: registra tu primera comida.`;
+
   return (
-    <div className="pb-24 px-4 pt-6 max-w-md mx-auto">
+    <div className="pb-32 px-4 pt-6 max-w-md mx-auto stagger">
       {/* Header */}
-      <div className="flex items-start justify-between mb-6 animate-fade-in">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-slate-400 text-sm">{getGreeting()},</p>
           <h1 className="text-2xl font-bold text-white">{profile.name} 👋</h1>
         </div>
-        <div className="flex items-center gap-1.5 bg-orange-500/15 border border-orange-500/30 rounded-full px-3 py-1.5">
-          <Flame size={14} className="text-orange-400" />
-          <span className="text-orange-300 text-sm font-semibold">{streak}d</span>
-        </div>
+        {streak > 0 && (
+          <div className="flex items-center gap-1.5 bg-orange-500/15 border border-orange-500/30 rounded-full px-3.5 py-2">
+            <Flame size={15} className="text-orange-400" fill="currentColor" />
+            <span className="text-orange-300 text-sm font-bold">{streak}</span>
+            <span className="text-orange-400/70 text-xs">días</span>
+          </div>
+        )}
       </div>
 
-      {/* Calorie ring */}
-      <div className="glass rounded-2xl p-5 mb-4 animate-slide-up">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-white font-semibold text-lg">Calorías de hoy</h2>
-            <p className="text-slate-400 text-sm">
-              {remaining > 0 ? `Faltan ${remaining} kcal` : '¡Meta alcanzada! 🎉'}
-            </p>
-          </div>
-          <div className="text-right">
-            <span className={`text-sm font-medium px-2 py-0.5 rounded-full ${
-              calPct >= 90 ? 'bg-brand-500/20 text-brand-400' :
-              calPct >= 50 ? 'bg-yellow-500/20 text-yellow-400' :
-              'bg-slate-700 text-slate-400'
-            }`}>
-              {calPct}%
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6">
+      {/* Hero calorie card */}
+      <div className="relative glass rounded-3xl p-6 mb-4 card-shadow overflow-hidden">
+        <div className="absolute -top-16 -right-16 w-40 h-40 bg-brand-500/10 rounded-full blur-2xl" />
+        <div className="relative flex items-center gap-6">
           <ProgressRing
             value={calories}
             max={targets.calories}
-            size={110}
-            strokeWidth={10}
+            size={130}
+            strokeWidth={12}
             color="#22c55e"
             label={`${Math.round(calories)}`}
-            sublabel="kcal"
+            sublabel={`de ${targets.calories}`}
           />
           <div className="flex-1 space-y-3">
             <MacroBar label="Proteína" current={protein} target={targets.protein} color="#4ade80" />
@@ -96,85 +85,79 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <MacroBar label="Grasa" current={fat} target={targets.fat} color="#f59e0b" />
           </div>
         </div>
-      </div>
-
-      {/* Quick stats */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        {[
-          { label: 'Meta kcal', value: targets.calories, icon: <Zap size={16} />, color: 'text-brand-400' },
-          { label: 'Proteína', value: `${targets.protein}g`, icon: <Droplets size={16} />, color: 'text-blue-400' },
-          { label: 'Peso obj.', value: `${profile.weight}kg`, icon: <TrendingUp size={16} />, color: 'text-purple-400' },
-        ].map(stat => (
-          <div key={stat.label} className="glass-light rounded-xl p-3 text-center">
-            <div className={`flex justify-center mb-1 ${stat.color}`}>{stat.icon}</div>
-            <div className="text-white font-bold">{stat.value}</div>
-            <div className="text-slate-500 text-xs">{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Meal checklist */}
-      <div className="glass rounded-2xl p-5 mb-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-white font-semibold text-lg">Comidas del día</h2>
-          <span className="text-xs text-slate-400">{mealTypesLogged.size}/{MEAL_TIMES.length}</span>
+        <div className="relative mt-4 pt-4 border-t border-slate-700/40 flex items-center gap-2">
+          <div className={`w-2 h-2 rounded-full ${calPct >= 100 ? 'bg-brand-400' : calPct >= 70 ? 'bg-yellow-400' : 'bg-slate-500'}`} />
+          <p className="text-slate-300 text-sm">{statusMsg}</p>
         </div>
-        <div className="space-y-2">
+      </div>
+
+      {/* Big add button */}
+      <button
+        onClick={() => onNavigate('log')}
+        className="press w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-brand-500 to-teal-500 text-white font-semibold text-lg shadow-lg shadow-brand-500/25 mb-4"
+      >
+        <Plus size={22} strokeWidth={2.5} /> Registrar comida
+      </button>
+
+      {/* Water */}
+      <div className="mb-4">
+        <WaterTracker />
+      </div>
+
+      {/* Meals checklist */}
+      <div className="glass rounded-3xl p-5 mb-4 card-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-white font-semibold">Comidas de hoy</h2>
+          <span className="text-xs text-slate-400 bg-slate-800/60 px-2.5 py-1 rounded-full">{mealTypesLogged.size}/{MEAL_TIMES.length}</span>
+        </div>
+        <div className="grid grid-cols-5 gap-2">
           {MEAL_TIMES.map(meal => {
             const done = mealTypesLogged.has(meal.type);
             return (
-              <div
+              <button
                 key={meal.type}
-                className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-                  done ? 'bg-brand-500/10 border border-brand-500/20' : 'bg-slate-800/40'
+                onClick={() => onNavigate('log')}
+                className={`press flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all ${
+                  done ? 'bg-brand-500/15 border border-brand-500/30' : 'bg-slate-800/40 border border-transparent'
                 }`}
               >
-                <span className="text-xl">{meal.emoji}</span>
-                <div className="flex-1">
-                  <div className={`font-medium text-sm ${done ? 'text-white' : 'text-slate-300'}`}>
-                    {meal.label}
-                  </div>
-                  <div className="text-xs text-slate-500">{meal.time}</div>
-                </div>
-                {done ? (
-                  <div className="w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center">
-                    <span className="text-xs text-white font-bold">✓</span>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => onNavigate('log')}
-                    className="text-xs text-slate-500 hover:text-brand-400 transition-colors"
-                  >
-                    + Añadir
-                  </button>
-                )}
-              </div>
+                <span className={`text-xl ${done ? '' : 'opacity-40 grayscale'}`}>{meal.emoji}</span>
+                <span className={`text-[9px] font-medium ${done ? 'text-brand-300' : 'text-slate-500'}`}>{meal.label}</span>
+                {done && <div className="w-1.5 h-1.5 rounded-full bg-brand-400" />}
+              </button>
             );
           })}
         </div>
       </div>
 
-      {/* Tip card */}
-      <div className="bg-gradient-to-r from-brand-900/60 to-teal-900/60 border border-brand-700/30 rounded-2xl p-4 mb-4">
+      {/* Tip */}
+      <div className="bg-gradient-to-br from-brand-900/50 to-teal-900/40 border border-brand-700/30 rounded-3xl p-5 mb-4">
         <div className="flex items-start gap-3">
-          <Trophy size={20} className="text-brand-400 flex-shrink-0 mt-0.5" />
+          <div className="w-9 h-9 rounded-xl bg-brand-500/20 flex items-center justify-center flex-shrink-0">
+            <Info size={18} className="text-brand-400" />
+          </div>
           <div>
-            <h3 className="text-white font-semibold text-sm mb-1">Consejo del día</h3>
+            <h3 className="text-white font-semibold text-sm mb-1">Tu clave para crecer</h3>
             <p className="text-slate-300 text-sm leading-relaxed">
-              La proteína es clave: intenta llegar a <span className="text-brand-400 font-medium">{targets.protein}g</span> cada día.
-              Distribuye entre {Math.ceil(targets.protein / 40)}–{Math.ceil(targets.protein / 30)} comidas para maximizar la síntesis muscular.
+              Llega a <span className="text-brand-400 font-semibold">{targets.protein}g de proteína</span> y a tus <span className="text-brand-400 font-semibold">{targets.calories} kcal</span> cada día.
+              No necesitas calcular nada: solo registra lo que comes y la app suma por ti.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Quick log button */}
+      {/* Quick link to progress */}
       <button
-        onClick={() => onNavigate('log')}
-        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-gradient-to-r from-brand-500 to-teal-500 text-white font-semibold text-lg hover:from-brand-400 hover:to-teal-400 transition-all shadow-lg shadow-brand-500/25 active:scale-95"
+        onClick={() => onNavigate('progress')}
+        className="press w-full flex items-center justify-between p-4 rounded-2xl glass-light"
       >
-        Registrar comida
-        <ChevronRight size={20} />
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-purple-500/15 flex items-center justify-center">
+            <TrendingUp size={18} className="text-purple-400" />
+          </div>
+          <span className="text-white font-medium text-sm">Ver mi progreso y peso</span>
+        </div>
+        <ChevronRight size={18} className="text-slate-500" />
       </button>
     </div>
   );

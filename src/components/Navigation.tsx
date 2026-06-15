@@ -1,4 +1,4 @@
-import { Home, UtensilsCrossed, BookOpen, TrendingUp, User } from 'lucide-react';
+import { Home, UtensilsCrossed, Plus, TrendingUp, BookOpen } from 'lucide-react';
 
 type Tab = 'dashboard' | 'meals' | 'log' | 'progress' | 'guide';
 
@@ -7,36 +7,51 @@ interface NavigationProps {
   onChange: (tab: Tab) => void;
 }
 
-const tabs: { id: Tab; icon: React.ComponentType<{ size?: number; className?: string }>; label: string }[] = [
+const sideTabs: { id: Tab; icon: React.ComponentType<{ size?: number }>; label: string }[] = [
   { id: 'dashboard', icon: Home, label: 'Inicio' },
   { id: 'meals', icon: UtensilsCrossed, label: 'Plan' },
-  { id: 'log', icon: BookOpen, label: 'Registro' },
+];
+const sideTabsRight: { id: Tab; icon: React.ComponentType<{ size?: number }>; label: string }[] = [
   { id: 'progress', icon: TrendingUp, label: 'Progreso' },
-  { id: 'guide', icon: User, label: 'Guía' },
+  { id: 'guide', icon: BookOpen, label: 'Guía' },
 ];
 
 export default function Navigation({ active, onChange }: NavigationProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-slate-700/50">
-      <div className="max-w-md mx-auto flex">
-        {tabs.map(({ id, icon: Icon, label }) => (
+    <nav className="fixed bottom-0 left-0 right-0 z-50">
+      <div className="max-w-md mx-auto relative px-3 pb-3">
+        <div className="glass rounded-3xl flex items-center justify-between px-2 py-2 card-shadow border border-slate-700/40">
+          {sideTabs.map(({ id, icon: Icon, label }) => (
+            <NavBtn key={id} active={active === id} onClick={() => onChange(id)} Icon={Icon} label={label} />
+          ))}
+
+          {/* Center action */}
           <button
-            key={id}
-            onClick={() => onChange(id)}
-            className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all duration-200 ${
-              active === id
-                ? 'text-brand-400'
-                : 'text-slate-500 hover:text-slate-300'
-            }`}
+            onClick={() => onChange('log')}
+            className="press relative -mt-8 w-16 h-16 rounded-full bg-gradient-to-br from-brand-400 to-teal-500 flex items-center justify-center shadow-[0_8px_24px_-4px_rgba(34,197,94,0.6)] border-4 border-[#0a0f1d]"
           >
-            <Icon size={20} className={active === id ? 'drop-shadow-[0_0_6px_rgba(74,222,128,0.6)]' : ''} />
-            <span className="text-[10px] font-medium">{label}</span>
-            {active === id && (
-              <span className="absolute bottom-1 w-1 h-1 rounded-full bg-brand-400" />
-            )}
+            <Plus size={28} className="text-white" strokeWidth={2.5} />
           </button>
-        ))}
+
+          {sideTabsRight.map(({ id, icon: Icon, label }) => (
+            <NavBtn key={id} active={active === id} onClick={() => onChange(id)} Icon={Icon} label={label} />
+          ))}
+        </div>
       </div>
     </nav>
+  );
+}
+
+function NavBtn({ active, onClick, Icon, label }: { active: boolean; onClick: () => void; Icon: React.ComponentType<{ size?: number }>; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`press flex flex-col items-center gap-0.5 px-3.5 py-1.5 rounded-2xl transition-colors ${
+        active ? 'text-brand-400' : 'text-slate-500'
+      }`}
+    >
+      <Icon size={21} />
+      <span className="text-[10px] font-medium">{label}</span>
+    </button>
   );
 }

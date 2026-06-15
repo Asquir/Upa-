@@ -19,10 +19,10 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen app-bg">
+      <div className="max-w-md mx-auto" key={activeTab}>
         {activeTab === 'dashboard' && <Dashboard onNavigate={(tab) => setActiveTab(tab as Tab)} />}
-        {activeTab === 'meals' && <MealPlan />}
+        {activeTab === 'meals' && <MealPlan onNavigate={(tab) => setActiveTab(tab as Tab)} />}
         {activeTab === 'log' && <FoodLog />}
         {activeTab === 'progress' && <Progress />}
         {activeTab === 'guide' && <Guide />}

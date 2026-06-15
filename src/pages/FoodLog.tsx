@@ -43,7 +43,7 @@ export default function FoodLog() {
   const entries = todayLog?.entries ?? [];
 
   const allFoods: FoodWithCat[] = useMemo(
-    () => [...state.customFoods, ...FOOD_DATABASE],
+    () => [...(state.customFoods as FoodWithCat[]), ...FOOD_DATABASE],
     [state.customFoods]
   );
 
@@ -203,34 +203,40 @@ export default function FoodLog() {
 
       {/* Results grid */}
       <div className="grid grid-cols-2 gap-2.5 mb-4">
-        {results.slice(0, 40).map(food => (
-          <button
-            key={food.id}
-            onClick={() => openFood(food)}
-            className={`press relative flex items-center gap-2.5 p-3 rounded-2xl text-left transition-all ${
-              justAdded === food.id ? 'bg-brand-500/20 border border-brand-500/50' : 'bg-slate-800/50 border border-slate-700/40'
-            }`}
-          >
-            <span className="text-2xl flex-shrink-0">{food.emoji}</span>
-            <div className="min-w-0 flex-1">
-              <div className="text-white text-xs font-medium truncate">{food.name}</div>
-              <div className="text-slate-500 text-[10px]">{food.calories} kcal · {food.protein}g prot</div>
-            </div>
-            {justAdded === food.id && (
-              <div className="absolute inset-0 flex items-center justify-center bg-brand-500/30 rounded-2xl animate-pop">
-                <Check size={24} className="text-white" strokeWidth={3} />
+        {results.slice(0, 40).map(food => {
+          const isMeal = (food as FoodWithCat).category === 'meals';
+          const displayKcal = isMeal
+            ? `~${Math.round(food.calories * 3.5)} kcal/plato`
+            : `${food.calories} kcal`;
+          return (
+            <button
+              key={food.id}
+              onClick={() => openFood(food)}
+              className={`press relative flex items-center gap-2.5 p-3 rounded-2xl text-left transition-all ${
+                justAdded === food.id ? 'bg-brand-500/20 border border-brand-500/50' : 'bg-slate-800/50 border border-slate-700/40'
+              }`}
+            >
+              <span className="text-2xl flex-shrink-0">{food.emoji}</span>
+              <div className="min-w-0 flex-1">
+                <div className="text-white text-xs font-medium truncate">{food.name}</div>
+                <div className="text-slate-500 text-[10px]">{displayKcal} · {food.protein}g prot</div>
               </div>
-            )}
-          </button>
-        ))}
+              {justAdded === food.id && (
+                <div className="absolute inset-0 flex items-center justify-center bg-brand-500/30 rounded-2xl animate-pop">
+                  <Check size={24} className="text-white" strokeWidth={3} />
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Create custom food */}
+      {/* Add unlisted meal */}
       <button
         onClick={() => setShowCreate(true)}
-        className="press w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-slate-600 text-slate-400 text-sm hover:border-brand-500 hover:text-brand-400 transition-colors mb-6"
+        className="press w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-slate-600 text-slate-400 text-sm hover:border-orange-500 hover:text-orange-400 transition-colors mb-6"
       >
-        <Sparkles size={15} /> Crear mi propio alimento
+        <Sparkles size={15} /> No encuentro mi plato — añadirlo
       </button>
 
       {/* Logged entries */}
@@ -285,7 +291,7 @@ export default function FoodLog() {
           onCreate={(food) => {
             dispatch({ type: 'ADD_CUSTOM_FOOD', food });
             setShowCreate(false);
-            openFood(food);
+            openFood(food as FoodWithCat);
           }}
         />
       )}
@@ -304,6 +310,7 @@ function PortionSheet({ food, grams, setGrams, isFavorite, onToggleFav, onClose,
   const prot = Math.round(food.protein * ratio * 10) / 10;
   const carb = Math.round(food.carbs * ratio * 10) / 10;
   const fat = Math.round(food.fat * ratio * 10) / 10;
+  const isMeal = cat === 'meals';
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center" onClick={onClose}>
@@ -314,7 +321,7 @@ function PortionSheet({ food, grams, setGrams, isFavorite, onToggleFav, onClose,
           <span className="text-4xl">{food.emoji}</span>
           <div className="flex-1">
             <div className="text-white font-semibold text-lg leading-tight">{food.name}</div>
-            <div className="text-slate-400 text-xs">{food.calories} kcal por 100g</div>
+            <div className="text-slate-400 text-xs">{isMeal ? 'Elige el tamaño de tu plato' : `${food.calories} kcal por 100g`}</div>
           </div>
           <button onClick={onToggleFav} className="press w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
             <Star size={18} className={isFavorite ? 'text-yellow-400' : 'text-slate-500'} fill={isFavorite ? 'currentColor' : 'none'} />
@@ -338,16 +345,19 @@ function PortionSheet({ food, grams, setGrams, isFavorite, onToggleFav, onClose,
           ))}
         </div>
 
-        {/* Fine adjust */}
-        <div className="flex items-center gap-3 mb-5">
-          <span className="text-slate-500 text-xs">Ajustar:</span>
-          <input
-            type="range" min={10} max={500} step={5} value={grams}
-            onChange={e => setGrams(+e.target.value)}
-            className="flex-1 accent-brand-500"
-          />
-          <span className="text-white text-sm font-semibold w-14 text-right">{grams}g</span>
-        </div>
+        {/* Fine adjust — hide for meals to avoid confusing gram display */}
+        {!isMeal && (
+          <div className="flex items-center gap-3 mb-5">
+            <span className="text-slate-500 text-xs">Ajustar:</span>
+            <input
+              type="range" min={10} max={500} step={5} value={grams}
+              onChange={e => setGrams(+e.target.value)}
+              className="flex-1 accent-brand-500"
+            />
+            <span className="text-white text-sm font-semibold w-14 text-right">{grams}g</span>
+          </div>
+        )}
+        {isMeal && <div className="mb-5" />}
 
         {/* Live macros */}
         <div className="grid grid-cols-4 gap-2 mb-5 text-center">
@@ -372,27 +382,76 @@ function PortionSheet({ food, grams, setGrams, isFavorite, onToggleFav, onClose,
   );
 }
 
+const DISH_TYPES = [
+  {
+    id: 'light',
+    label: 'Ligero',
+    icon: '🥗',
+    examples: 'Sopa, ensalada, verduras, gazpacho',
+    calories: 75, protein: 4, carbs: 9, fat: 2,
+  },
+  {
+    id: 'normal',
+    label: 'Normal',
+    icon: '🍝',
+    examples: 'Pasta, arroz, guiso, paella, lentejas',
+    calories: 155, protein: 9, carbs: 22, fat: 4,
+  },
+  {
+    id: 'heavy',
+    label: 'Contundente',
+    icon: '🍕',
+    examples: 'Pizza, hamburguesa, frituras, bocadillo',
+    calories: 265, protein: 13, carbs: 28, fat: 12,
+  },
+];
+
 function CreateFoodSheet({ onClose, onCreate }: { onClose: () => void; onCreate: (f: CustomFood) => void }) {
+  const [mode, setMode] = useState<'plate' | 'label'>('plate');
+
+  // Plate mode state
   const [name, setName] = useState('');
   const [emoji, setEmoji] = useState('🍽️');
-  const [kcal, setKcal] = useState('');
-  const [prot, setProt] = useState('');
-  const [carb, setCarb] = useState('');
-  const [fat, setFat] = useState('');
+  const [dishType, setDishType] = useState('normal');
 
-  const emojis = ['🍽️', '🍗', '🍚', '🥑', '🥦', '🍎', '🥛', '🍫', '🥤', '🍕', '🍔', '🌮', '🍱', '🥗'];
-  const valid = name.trim() && +kcal > 0;
+  // Label mode state
+  const [labelKcal, setLabelKcal] = useState('');
+  const [labelProt, setLabelProt] = useState('');
+  const [labelCarb, setLabelCarb] = useState('');
+  const [labelFat, setLabelFat] = useState('');
 
-  function create() {
-    if (!valid) return;
+  const plateEmojis = ['🍽️', '🥘', '🍝', '🍛', '🫕', '🍲', '🥗', '🍕', '🍔', '🌮', '🌯', '🥙', '🍱', '🍣', '🍗', '🐟', '🫘', '🥖'];
+  const labelEmojis = ['🍽️', '🍗', '🍚', '🥑', '🥦', '🍎', '🥛', '🍫', '🥤', '🍕', '🍔', '🌮', '🍱', '🥗'];
+
+  const plateValid = name.trim().length > 0;
+  const labelValid = name.trim().length > 0 && +labelKcal > 0;
+
+  function createPlate() {
+    if (!plateValid) return;
+    const dt = DISH_TYPES.find(d => d.id === dishType) ?? DISH_TYPES[1];
     onCreate({
       id: 'custom_' + genId(),
       name: name.trim(),
       emoji,
-      calories: +kcal,
-      protein: +prot || 0,
-      carbs: +carb || 0,
-      fat: +fat || 0,
+      calories: dt.calories,
+      protein: dt.protein,
+      carbs: dt.carbs,
+      fat: dt.fat,
+      serving: '100g',
+      category: 'meals',
+    });
+  }
+
+  function createLabel() {
+    if (!labelValid) return;
+    onCreate({
+      id: 'custom_' + genId(),
+      name: name.trim(),
+      emoji,
+      calories: +labelKcal,
+      protein: +labelProt || 0,
+      carbs: +labelCarb || 0,
+      fat: +labelFat || 0,
       serving: '100g',
     });
   }
@@ -400,42 +459,110 @@ function CreateFoodSheet({ onClose, onCreate }: { onClose: () => void; onCreate:
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 animate-fade-in" />
-      <div className="relative w-full max-w-md glass rounded-t-3xl p-5 pb-8 animate-slide-up border-t border-slate-700/50 max-h-[90vh] overflow-y-auto scrollbar-hide" onClick={e => e.stopPropagation()}>
+      <div className="relative w-full max-w-md glass rounded-t-3xl p-5 pb-8 animate-slide-up border-t border-slate-700/50 max-h-[92vh] overflow-y-auto scrollbar-hide" onClick={e => e.stopPropagation()}>
         <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto mb-4" />
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-4">
           <button onClick={onClose} className="press text-slate-400"><ChevronLeft size={20} /></button>
-          <h2 className="text-white font-semibold text-lg">Crear alimento</h2>
-        </div>
-        <p className="text-slate-400 text-xs mb-5 ml-7">Pon los valores por cada 100g (mira la etiqueta del producto).</p>
-
-        <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-1">
-          {emojis.map(e => (
-            <button key={e} onClick={() => setEmoji(e)} className={`press flex-none w-11 h-11 rounded-xl text-xl flex items-center justify-center ${emoji === e ? 'bg-brand-500/30 border-2 border-brand-500' : 'bg-slate-800/60'}`}>{e}</button>
-          ))}
+          <h2 className="text-white font-semibold text-lg">Añadir plato o comida</h2>
         </div>
 
-        <input type="text" placeholder="Nombre del alimento" value={name} onChange={e => setName(e.target.value)}
-          className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 mb-3" />
+        {/* Mode tabs */}
+        <div className="flex bg-slate-800/60 rounded-xl p-1 mb-5">
+          <button
+            onClick={() => setMode('plate')}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode === 'plate' ? 'bg-orange-500 text-white' : 'text-slate-400'}`}
+          >
+            🍽️ Plato casero
+          </button>
+          <button
+            onClick={() => setMode('label')}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode === 'label' ? 'bg-brand-500 text-white' : 'text-slate-400'}`}
+          >
+            📋 Con etiqueta
+          </button>
+        </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          {[
-            { ph: 'Calorías', v: kcal, set: setKcal, unit: 'kcal' },
-            { ph: 'Proteína', v: prot, set: setProt, unit: 'g' },
-            { ph: 'Carbos', v: carb, set: setCarb, unit: 'g' },
-            { ph: 'Grasa', v: fat, set: setFat, unit: 'g' },
-          ].map(f => (
-            <div key={f.ph}>
-              <label className="text-slate-400 text-xs mb-1 block">{f.ph} <span className="text-slate-600">/100g</span></label>
-              <input type="number" placeholder={f.unit} value={f.v} onChange={e => f.set(e.target.value)}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:border-brand-500 text-center" />
+        {mode === 'plate' ? (
+          <>
+            <p className="text-slate-400 text-xs mb-4">Dime qué comiste — yo estimo las calorías. No necesitas saber nada de nutrición.</p>
+
+            {/* Emoji picker */}
+            <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-1">
+              {plateEmojis.map(e => (
+                <button key={e} onClick={() => setEmoji(e)} className={`press flex-none w-11 h-11 rounded-xl text-xl flex items-center justify-center ${emoji === e ? 'bg-orange-500/30 border-2 border-orange-500' : 'bg-slate-800/60'}`}>{e}</button>
+              ))}
             </div>
-          ))}
-        </div>
 
-        <button onClick={create} disabled={!valid}
-          className={`press w-full py-3.5 rounded-2xl font-semibold ${valid ? 'bg-gradient-to-r from-brand-500 to-teal-500 text-white' : 'bg-slate-800 text-slate-500'}`}>
-          Crear y usar
-        </button>
+            <input
+              type="text"
+              placeholder="¿Qué comiste? (ej: Paella, Cocido...)"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 mb-4"
+            />
+
+            <p className="text-slate-400 text-xs font-medium mb-2">¿Cómo era el plato?</p>
+            <div className="space-y-2 mb-5">
+              {DISH_TYPES.map(dt => (
+                <button
+                  key={dt.id}
+                  onClick={() => setDishType(dt.id)}
+                  className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 text-left transition-all ${
+                    dishType === dt.id ? 'border-orange-500 bg-orange-500/10' : 'border-slate-700/50 bg-slate-800/40'
+                  }`}
+                >
+                  <span className="text-2xl">{dt.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white font-semibold text-sm">{dt.label}</div>
+                    <div className="text-slate-400 text-xs truncate">{dt.examples}</div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-orange-400 text-xs font-semibold">~{Math.round(dt.calories * 3.5)} kcal</div>
+                    <div className="text-slate-500 text-[10px]">plato normal</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <button onClick={createPlate} disabled={!plateValid}
+              className={`press w-full py-3.5 rounded-2xl font-semibold text-base ${plateValid ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/25' : 'bg-slate-800 text-slate-500'}`}>
+              Añadir — elegir cuánto comí →
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="text-slate-400 text-xs mb-4">Si tienes la etiqueta del producto, pon los valores por 100g.</p>
+
+            <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-1">
+              {labelEmojis.map(e => (
+                <button key={e} onClick={() => setEmoji(e)} className={`press flex-none w-11 h-11 rounded-xl text-xl flex items-center justify-center ${emoji === e ? 'bg-brand-500/30 border-2 border-brand-500' : 'bg-slate-800/60'}`}>{e}</button>
+              ))}
+            </div>
+
+            <input type="text" placeholder="Nombre del producto" value={name} onChange={e => setName(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 mb-3" />
+
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              {[
+                { ph: 'Calorías', v: labelKcal, set: setLabelKcal, unit: 'kcal' },
+                { ph: 'Proteína', v: labelProt, set: setLabelProt, unit: 'g' },
+                { ph: 'Carbos', v: labelCarb, set: setLabelCarb, unit: 'g' },
+                { ph: 'Grasa', v: labelFat, set: setLabelFat, unit: 'g' },
+              ].map(f => (
+                <div key={f.ph}>
+                  <label className="text-slate-400 text-xs mb-1 block">{f.ph} <span className="text-slate-600">/100g</span></label>
+                  <input type="number" placeholder={f.unit} value={f.v} onChange={e => f.set(e.target.value)}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:border-brand-500 text-center" />
+                </div>
+              ))}
+            </div>
+
+            <button onClick={createLabel} disabled={!labelValid}
+              className={`press w-full py-3.5 rounded-2xl font-semibold ${labelValid ? 'bg-gradient-to-r from-brand-500 to-teal-500 text-white' : 'bg-slate-800 text-slate-500'}`}>
+              Crear y usar
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

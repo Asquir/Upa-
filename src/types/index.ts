@@ -66,6 +66,7 @@ export interface CustomFood {
   carbs: number;
   fat: number;
   serving: string;
+  category?: string;
 }
 
 export interface AppState {

@@ -1,6 +1,6 @@
 import type { FoodItem } from '../types';
 
-export type FoodCategory = 'protein' | 'carbs' | 'fats' | 'veggies' | 'fruits' | 'dairy' | 'snacks' | 'drinks';
+export type FoodCategory = 'protein' | 'carbs' | 'fats' | 'veggies' | 'fruits' | 'dairy' | 'snacks' | 'drinks' | 'meals';
 
 export interface CategoryInfo {
   id: FoodCategory;
@@ -10,6 +10,7 @@ export interface CategoryInfo {
 }
 
 export const CATEGORIES: CategoryInfo[] = [
+  { id: 'meals', label: 'Platos', emoji: '🍽️', color: '#f97316' },
   { id: 'protein', label: 'Proteínas', emoji: '🍗', color: '#4ade80' },
   { id: 'carbs', label: 'Carbohidratos', emoji: '🍚', color: '#60a5fa' },
   { id: 'fats', label: 'Grasas', emoji: '🥑', color: '#f59e0b' },
@@ -139,6 +140,42 @@ export const FOOD_DATABASE: ExtendedFood[] = [
   { id: 'almond_milk', name: 'Leche de almendras', emoji: '🥛', calories: 17, protein: 0.6, carbs: 0.6, fat: 1.5, serving: '100ml', category: 'drinks' },
   { id: 'oat_milk', name: 'Leche de avena', emoji: '🥛', calories: 47, protein: 1, carbs: 7, fat: 1.5, serving: '100ml', category: 'drinks' },
   { id: 'soda', name: 'Refresco', emoji: '🥤', calories: 42, protein: 0, carbs: 11, fat: 0, serving: '100ml', category: 'drinks' },
+
+  // ===== PLATOS PREPARADOS =====
+  { id: 'paella_marisco', name: 'Paella de marisco', emoji: '🥘', calories: 148, protein: 9, carbs: 24, fat: 3, serving: '100g', category: 'meals' },
+  { id: 'paella_valenciana', name: 'Paella valenciana', emoji: '🥘', calories: 162, protein: 10, carbs: 25, fat: 4, serving: '100g', category: 'meals' },
+  { id: 'tortilla_espanola', name: 'Tortilla española', emoji: '🍳', calories: 185, protein: 10, carbs: 14, fat: 10, serving: '100g', category: 'meals' },
+  { id: 'pasta_bolognesa', name: 'Pasta boloñesa', emoji: '🍝', calories: 145, protein: 9, carbs: 18, fat: 4.5, serving: '100g', category: 'meals' },
+  { id: 'espagueti_carbonara', name: 'Espaguetis carbonara', emoji: '🍝', calories: 195, protein: 9, carbs: 26, fat: 7, serving: '100g', category: 'meals' },
+  { id: 'pizza_margherita', name: 'Pizza margherita', emoji: '🍕', calories: 266, protein: 11, carbs: 33, fat: 10, serving: '100g', category: 'meals' },
+  { id: 'hamburguesa', name: 'Hamburguesa', emoji: '🍔', calories: 295, protein: 17, carbs: 24, fat: 14, serving: '100g', category: 'meals' },
+  { id: 'bocadillo_jamon', name: 'Bocadillo de jamón', emoji: '🥖', calories: 255, protein: 15, carbs: 30, fat: 8, serving: '100g', category: 'meals' },
+  { id: 'sandwich_mixto', name: 'Sandwich / Bocadillo', emoji: '🥪', calories: 240, protein: 12, carbs: 30, fat: 8, serving: '100g', category: 'meals' },
+  { id: 'lentejas_guisadas', name: 'Lentejas guisadas', emoji: '🫘', calories: 130, protein: 9, carbs: 18, fat: 3, serving: '100g', category: 'meals' },
+  { id: 'arroz_pollo', name: 'Arroz con pollo', emoji: '🍗', calories: 160, protein: 12, carbs: 20, fat: 4, serving: '100g', category: 'meals' },
+  { id: 'ensalada_mixta', name: 'Ensalada mixta', emoji: '🥗', calories: 65, protein: 3, carbs: 6, fat: 3.5, serving: '100g', category: 'meals' },
+  { id: 'ensalada_cesar', name: 'Ensalada César con pollo', emoji: '🥗', calories: 120, protein: 11, carbs: 7, fat: 6, serving: '100g', category: 'meals' },
+  { id: 'pollo_asado', name: 'Pollo asado', emoji: '🍗', calories: 215, protein: 28, carbs: 0, fat: 12, serving: '100g', category: 'meals' },
+  { id: 'pollo_plancha', name: 'Pollo a la plancha con arroz', emoji: '🍗', calories: 145, protein: 18, carbs: 16, fat: 3, serving: '100g', category: 'meals' },
+  { id: 'croquetas', name: 'Croquetas', emoji: '🍳', calories: 265, protein: 8, carbs: 22, fat: 16, serving: '100g', category: 'meals' },
+  { id: 'sopa_cocido', name: 'Sopa / Caldo', emoji: '🍲', calories: 45, protein: 3, carbs: 6, fat: 1, serving: '100g', category: 'meals' },
+  { id: 'cocido_madrileno', name: 'Cocido / Puchero', emoji: '🫕', calories: 155, protein: 12, carbs: 14, fat: 5.5, serving: '100g', category: 'meals' },
+  { id: 'estofado', name: 'Estofado de carne', emoji: '🫕', calories: 150, protein: 14, carbs: 10, fat: 6, serving: '100g', category: 'meals' },
+  { id: 'sushi', name: 'Sushi / Makis', emoji: '🍣', calories: 145, protein: 7, carbs: 24, fat: 2, serving: '100g', category: 'meals' },
+  { id: 'kebab', name: 'Kebab', emoji: '🌯', calories: 260, protein: 16, carbs: 25, fat: 10, serving: '100g', category: 'meals' },
+  { id: 'tacos', name: 'Tacos', emoji: '🌮', calories: 218, protein: 11, carbs: 22, fat: 9, serving: '100g', category: 'meals' },
+  { id: 'wrap_pollo', name: 'Wrap de pollo', emoji: '🌯', calories: 200, protein: 14, carbs: 22, fat: 6, serving: '100g', category: 'meals' },
+  { id: 'ensaladilla_rusa', name: 'Ensaladilla rusa', emoji: '🥗', calories: 185, protein: 3.5, carbs: 11, fat: 15, serving: '100g', category: 'meals' },
+  { id: 'gazpacho', name: 'Gazpacho', emoji: '🍅', calories: 50, protein: 1, carbs: 8, fat: 2, serving: '100g', category: 'meals' },
+  { id: 'patatas_bravas', name: 'Patatas bravas', emoji: '🥔', calories: 185, protein: 3, carbs: 22, fat: 9, serving: '100g', category: 'meals' },
+  { id: 'arroz_cubana', name: 'Arroz a la cubana', emoji: '🍳', calories: 155, protein: 7, carbs: 22, fat: 5, serving: '100g', category: 'meals' },
+  { id: 'pollo_curry', name: 'Pollo al curry', emoji: '🍛', calories: 170, protein: 16, carbs: 8, fat: 8, serving: '100g', category: 'meals' },
+  { id: 'pollo_empanado', name: 'Pollo empanado', emoji: '🍗', calories: 248, protein: 18, carbs: 15, fat: 13, serving: '100g', category: 'meals' },
+  { id: 'bacalao_tomate', name: 'Bacalao con tomate', emoji: '🐟', calories: 110, protein: 15, carbs: 6, fat: 3, serving: '100g', category: 'meals' },
+  { id: 'salmon_plancha', name: 'Salmón a la plancha', emoji: '🐟', calories: 210, protein: 22, carbs: 0, fat: 14, serving: '100g', category: 'meals' },
+  { id: 'merluza_horno', name: 'Merluza al horno', emoji: '🐟', calories: 105, protein: 19, carbs: 3, fat: 2, serving: '100g', category: 'meals' },
+  { id: 'fabada', name: 'Fabada / Judías', emoji: '🫘', calories: 145, protein: 8, carbs: 17, fat: 5, serving: '100g', category: 'meals' },
+  { id: 'mac_cheese', name: 'Mac & cheese', emoji: '🧀', calories: 180, protein: 7, carbs: 20, fat: 8, serving: '100g', category: 'meals' },
 ];
 
 export interface Portion {
@@ -149,6 +186,12 @@ export interface Portion {
 
 // Raciones intuitivas por categoría — el usuario no necesita saber gramos.
 export const PORTION_PRESETS: Record<FoodCategory, Portion[]> = {
+  meals: [
+    { label: 'Poco', hint: 'ración pequeña', grams: 200 },
+    { label: 'Normal', hint: 'plato estándar', grams: 350 },
+    { label: 'Bastante', hint: 'plato grande', grams: 500 },
+    { label: 'Mucho', hint: 'doble ración', grams: 700 },
+  ],
   protein: [
     { label: 'Poco', hint: '½ filete', grams: 75 },
     { label: 'Normal', hint: '1 filete / palma', grams: 150 },

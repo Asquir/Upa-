@@ -140,6 +140,35 @@ export const FOOD_DATABASE: ExtendedFood[] = [
   { id: 'almond_milk', name: 'Leche de almendras', emoji: '🥛', calories: 17, protein: 0.6, carbs: 0.6, fat: 1.5, serving: '100ml', category: 'drinks' },
   { id: 'oat_milk', name: 'Leche de avena', emoji: '🥛', calories: 47, protein: 1, carbs: 7, fat: 1.5, serving: '100ml', category: 'drinks' },
   { id: 'soda', name: 'Refresco', emoji: '🥤', calories: 42, protein: 0, carbs: 11, fat: 0, serving: '100ml', category: 'drinks' },
+  { id: 'cola_cao', name: 'Cola Cao / Nesquik (polvo)', emoji: '🍫', calories: 380, protein: 10, carbs: 75, fat: 6, serving: '100g (≈4 cdas)', category: 'drinks' },
+  { id: 'leche_colacao', name: 'Vaso de leche con Cola Cao', emoji: '🥛', calories: 165, protein: 9, carbs: 22, fat: 5, serving: '1 vaso (250ml + 20g)', category: 'drinks' },
+  { id: 'cafe_leche', name: 'Café con leche', emoji: '☕', calories: 55, protein: 3, carbs: 4.5, fat: 2.5, serving: '250ml', category: 'drinks' },
+
+  // ===== EMBUTIDOS Y CHARCUTERÍA =====
+  { id: 'fuet', name: 'Fuet', emoji: '🌭', calories: 430, protein: 22, carbs: 1, fat: 38, serving: '100g', category: 'protein' },
+  { id: 'chorizo', name: 'Chorizo', emoji: '🌭', calories: 455, protein: 24, carbs: 2, fat: 38, serving: '100g', category: 'protein' },
+  { id: 'salchichon', name: 'Salchichón', emoji: '🌭', calories: 415, protein: 22, carbs: 1.5, fat: 36, serving: '100g', category: 'protein' },
+  { id: 'jamon_serrano', name: 'Jamón serrano', emoji: '🍖', calories: 241, protein: 31, carbs: 0, fat: 13, serving: '100g', category: 'protein' },
+  { id: 'jamon_york', name: 'Jamón de York / cocido', emoji: '🍖', calories: 107, protein: 16, carbs: 2, fat: 4, serving: '100g', category: 'protein' },
+  { id: 'pavo_lonchas', name: 'Pavo en lonchas (fiambre)', emoji: '🦃', calories: 100, protein: 18, carbs: 2, fat: 2, serving: '100g', category: 'protein' },
+  { id: 'mortadela', name: 'Mortadela', emoji: '🌭', calories: 310, protein: 14, carbs: 3, fat: 27, serving: '100g', category: 'protein' },
+  { id: 'lomo_embuchado', name: 'Lomo embuchado', emoji: '🍖', calories: 186, protein: 32, carbs: 0, fat: 6, serving: '100g', category: 'protein' },
+
+  // ===== PAN Y BOLLERÍA =====
+  { id: 'pan_molde_blanco', name: 'Pan de molde blanco (Bimbo)', emoji: '🍞', calories: 268, protein: 8, carbs: 49, fat: 5, serving: '100g (≈3 rebanadas)', category: 'carbs' },
+  { id: 'pan_molde_integral', name: 'Pan de molde integral', emoji: '🍞', calories: 235, protein: 10, carbs: 42, fat: 4, serving: '100g (≈3 rebanadas)', category: 'carbs' },
+  { id: 'biscotes', name: 'Biscotes / Tostadas', emoji: '🍞', calories: 385, protein: 11, carbs: 72, fat: 7, serving: '100g (≈7 tostadas)', category: 'carbs' },
+  { id: 'pan_baguette', name: 'Barra de pan / Baguette', emoji: '🥖', calories: 272, protein: 9, carbs: 54, fat: 2, serving: '100g', category: 'carbs' },
+  { id: 'magdalena', name: 'Magdalena', emoji: '🧁', calories: 390, protein: 7, carbs: 56, fat: 16, serving: '100g (≈2 uds)', category: 'carbs' },
+  { id: 'croissant', name: 'Croissant', emoji: '🥐', calories: 406, protein: 8, carbs: 45, fat: 21, serving: '1 unidad (80g)', category: 'carbs' },
+
+  // ===== UNTABLES Y DULCES =====
+  { id: 'nocilla', name: 'Nocilla / Nutella', emoji: '🍫', calories: 541, protein: 6, carbs: 58, fat: 31, serving: '100g', category: 'snacks' },
+  { id: 'mantequilla', name: 'Mantequilla', emoji: '🧈', calories: 717, protein: 0.9, carbs: 0.1, fat: 81, serving: '100g', category: 'snacks' },
+  { id: 'mermelada', name: 'Mermelada / Confitura', emoji: '🍓', calories: 250, protein: 0.5, carbs: 62, fat: 0.1, serving: '100g', category: 'snacks' },
+  { id: 'galletas_maria', name: 'Galletas María', emoji: '🍪', calories: 424, protein: 8, carbs: 77, fat: 9, serving: '100g (≈8 galletas)', category: 'snacks' },
+  { id: 'galletas_oreo', name: 'Galletas Oreo', emoji: '🍪', calories: 473, protein: 5, carbs: 69, fat: 20, serving: '100g (≈8 galletas)', category: 'snacks' },
+  { id: 'aceite_oliva_tostada', name: 'Pan con aceite de oliva', emoji: '🍞', calories: 310, protein: 5, carbs: 35, fat: 16, serving: '100g', category: 'snacks' },
 
   // ===== PLATOS PREPARADOS =====
   { id: 'paella_marisco', name: 'Paella de marisco', emoji: '🥘', calories: 148, protein: 9, carbs: 24, fat: 3, serving: '100g', category: 'meals' },
@@ -225,7 +254,8 @@ export const PORTION_PRESETS: Record<FoodCategory, Portion[]> = {
     { label: 'Bastante', hint: 'ración grande', grams: 300 },
   ],
   snacks: [
-    { label: 'Poco', hint: 'puñado', grams: 30 },
+    { label: 'Pizca', hint: '1 cucharada', grams: 15 },
+    { label: 'Poco', hint: 'puñado / 2 cdas', grams: 30 },
     { label: 'Normal', hint: '1 ración', grams: 60 },
     { label: 'Bastante', hint: 'ración grande', grams: 100 },
   ],
